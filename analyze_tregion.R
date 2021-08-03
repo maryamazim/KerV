@@ -1,14 +1,15 @@
 
-tregionC = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionC.csv')
-tregionA = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionA.csv')
-tregion2C = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregion2C.csv')
-tregion2A = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregion2A.csv')
-tregion3C = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregion3C.csv')
-tregion3A = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregion3A.csv')
-tregion4C = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregion4C.csv')
-tregion4A = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregion4A.csv')
-tregion5C = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregion5C.csv')
-tregion5A = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregion5A.csv')
+tregionALL = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregion_mod.csv')
+tregionC = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionC_mod.csv')
+tregionA = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionA_mod.csv')
+tregion2C = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionC_mod100.csv')
+tregion2A = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionA_mod100.csv')
+tregion3C = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionC_mod200.csv')
+tregion3A = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionA_mod200.csv')
+tregion4C = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionC_mod300.csv')
+tregion4A = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionA_mod300.csv')
+tregion5C = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionC_mod400.csv')
+tregion5A = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/PromoterPosition/tregionA_mod400.csv')
 
 getNum = function(column){
   x = unlist(purrr::map(stringr::str_split(column, ', '), length))
@@ -16,116 +17,62 @@ getNum = function(column){
   return(x)
 }
 
-getFU = function(tregion, methyl){
-  name = paste0('fuC', methyl)
-  df = get(name)
-  tregion$d1_CCGG_allInd_num = getNum(tregion$d1_CCGG_allInd)
-  tregion$d2_GGCC_allInd_num = getNum(tregion$d2_GGCC_allInd)
-  df = data.frame(ID = rep(tregionC$PAO1.ID.1,2), 
-                   Density = c(tregion$d1_CCGG_allInd_num, tregion$d2_GGCC_allInd_num),
-                   Seqeunce = c(rep('CCGG', nrow(tregion)),rep('GGCC', nrow(tregion))),
-                   Direction = rep(tregion$strand,2),
-                   Which100 = n)
+getFUC = function(sRegion, methyl){
+  sRegion$d1_CCGG_allInd_num = getNum(sRegion$d1_CCGG_allInd)
+  sRegion$d2_GGCC_allInd_num = getNum(sRegion$d2_GGCC_allInd)
+  df = data.frame(ID = rep(sRegion$PAO1.ID.1,2), 
+                   Density = c(sRegion$d1_CCGG_allInd_num, sRegion$d2_GGCC_allInd_num),
+                   Seqeunce = c(rep('CCGG', nrow(sRegion)),rep('GGCC', nrow(sRegion))),
+                   Direction = rep(sRegion$strand,2),
+                   Which100 = methyl)
   return(df)
 }
 
+getFUA = function(sRegion, methyl){
+  sRegion$d1_GATC_allInd_num = getNum(sRegion$d1_GATC_allInd)
+  sRegion$d2_CTAG_allInd_num = getNum(sRegion$d2_CTAG_allInd)
+  sRegion$d3_TCGA_allInd_num = getNum(sRegion$d3_TCGA_allInd)
+  sRegion$d4_AGCT_allInd_num = getNum(sRegion$d4_AGCT_allInd)
+  df = data.frame(ID = rep(sRegion$PAO1.ID.1,4), 
+                  Density = c(sRegion$d1_GATC_allInd_num, sRegion$d2_CTAG_allInd_num,
+                              sRegion$d3_TCGA_allInd_num, sRegion$d4_AGCT_allInd_num),
+                  Seqeunce = c(rep('GATC', nrow(sRegion)),rep('CTAG', nrow(sRegion)), 
+                               rep('TCGA', nrow(sRegion)), rep('AGCT', nrow(sRegion))),
+                  Direction = rep(sRegion$strand,2),
+                  Which100 = methyl)
+  return(df)
+}
 
+getFU = function(sRegion, methyl){
+  sRegion$d1_CCGG_allInd_num = getNum(sRegion$d1_CCGG_allInd)
+  sRegion$d2_GGCC_allInd_num = getNum(sRegion$d2_GGCC_allInd)
+  sRegion$d3_GATC_allInd_num = getNum(sRegion$d3_GATC_allInd)
+  sRegion$d4_CTAG_allInd_num = getNum(sRegion$d4_CTAG_allInd)
+  sRegion$d5_TCGA_allInd_num = getNum(sRegion$d5_TCGA_allInd)
+  sRegion$d6_AGCT_allInd_num = getNum(sRegion$d6_AGCT_allInd)
+  df = data.frame(ID = rep(sRegion$PAO1.ID.1,6), 
+                  Density = c(sRegion$d1_CCGG_allInd_num, sRegion$d2_GGCC_allInd_num,
+                              sRegion$d3_GATC_allInd_num, sRegion$d4_CTAG_allInd_num,
+                              sRegion$d5_TCGA_allInd_num, sRegion$d6_AGCT_allInd_num),
+                  Seqeunce = c(rep('CCGG', nrow(sRegion)),rep('GGCC', nrow(sRegion)), 
+                               rep('GATC', nrow(sRegion)),rep('CTAG', nrow(sRegion)), 
+                               rep('TCGA', nrow(sRegion)),rep('AGCT', nrow(sRegion))),
+                  Direction = rep(sRegion$strand,2),
+                  Which100 = methyl)
+  return(df)
+}
 
-getFU(tregionC_mod, 1)
-
-tregionC$d1_CCGG_allInd_num = getNum(tregionC$d1_CCGG_allInd)
-tregionC$d2_GGCC_allInd_num = getNum(tregionC$d2_GGCC_allInd)
-fuC = data.frame(ID = rep(tregionC$PAO1.ID.1,2), 
-                Density = c(tregionC$d1_CCGG_allInd_num, tregionC$d2_GGCC_allInd_num),
-                Seqeunce = c(rep('CCGG', nrow(tregionC)),rep('GGCC', nrow(tregionC))),
-                Direction = rep(tregionC$strand,2),
-                Which100 = 1)
-
-tregion2C$d1_CCGG_allInd_num = getNum(tregion2C$d1_CCGG_allInd)
-tregion2C$d2_GGCC_allInd_num = getNum(tregion2C$d2_GGCC_allInd)
-fu2C = data.frame(ID = rep(tregion2C$PAO1.ID.1,2), 
-                Density = c(tregion2C$d1_CCGG_allInd_num, tregion2C$d2_GGCC_allInd_num),
-                Seqeunce = c(rep('CCGG', nrow(tregion2C)),rep('GGCC', nrow(tregion2C))),
-                Direction = rep(tregion2C$strand,2),
-                Which100 = 2)
-
-tregion3C$d1_CCGG_allInd_num = getNum(tregion3C$d1_CCGG_allInd)
-tregion3C$d2_GGCC_allInd_num = getNum(tregion3C$d2_GGCC_allInd)
-fu3C = data.frame(ID = rep(tregion3C$PAO1.ID.1,2), 
-                Density = c(tregion3C$d1_CCGG_allInd_num, tregion3C$d2_GGCC_allInd_num),
-                Seqeunce = c(rep('CCGG', nrow(tregion3C)),rep('GGCC', nrow(tregion3C))),
-                Direction = rep(tregion3C$strand,2),
-                Which100 = 3)
-
-tregion4C$d1_CCGG_allInd_num = getNum(tregion4C$d1_CCGG_allInd)
-tregion4C$d2_GGCC_allInd_num = getNum(tregion4C$d2_GGCC_allInd)
-fu4C = data.frame(ID = rep(tregionC$PAO1.ID.1,2), 
-                Density = c(tregion4C$d1_CCGG_allInd_num, tregion4C$d2_GGCC_allInd_num),
-                Seqeunce = c(rep('CCGG', nrow(tregion4C)),rep('GGCC', nrow(tregion4C))),
-                Direction = rep(tregion4C$strand,2),
-                Which100 = 4)
-
-tregion5C$d1_CCGG_allInd_num = getNum(tregion5C$d1_CCGG_allInd)
-tregion5C$d2_GGCC_allInd_num = getNum(tregion5C$d2_GGCC_allInd)
-fu5C = data.frame(ID = rep(tregion5C$PAO1.ID.1,2), 
-                Density = c(tregion5C$d1_CCGG_allInd_num, tregion5C$d2_GGCC_allInd_num),
-                Seqeunce = c(rep('CCGG', nrow(tregion5C)),rep('GGCC', nrow(tregion5C))),
-                Direction = rep(tregion5C$strand,2),
-                Which100 = 5)
-
-
-#######################################################################
-
-tregionA$d1_GATC_allInd_num = getNum(tregionA$d1_GATC_allInd)
-tregionA$d2_CTAG_allInd_num = getNum(tregionA$d2_CTAG_allInd)
-tregionA$d3_TCGA_allInd_num =  getNum(tregionA$d3_TCGA_allInd)
-tregionA$d4_AGCT_allInd_num =  getNum(tregionA$d4_AGCT_allInd)
-fuA = data.frame(ID = rep(tregionA$PAO1.ID.1,4), 
-                Density = c(tregionA$d1_GATC_allInd_num, tregionA$d2_CTAG_allInd_num, tregionA$d3_TCGA_allInd_num, tregionA$d4_AGCT_allInd_num),
-                Seqeunce = c(rep('GATC', nrow(tregionA)),rep('CTAG', nrow(tregionA)), rep('TCGA', nrow(tregionA)), rep('AGCT', nrow(tregionA))),
-                Direction = rep(tregionA$strand,2),
-                Which100 = 1)
-
-tregion2A$d1_GATC_allInd_num = getNum(tregion2A$d1_GATC_allInd)
-tregion2A$d2_CTAG_allInd_num = getNum(tregion2A$d2_CTAG_allInd)
-tregion2A$d3_TCGA_allInd_num = getNum(tregion2A$d3_TCGA_allInd)
-tregion2A$d4_AGCT_allInd_num = getNum(tregion2A$d4_AGCT_allInd)
-fu2A = data.frame(ID = rep(tregion2A$PAO1.ID.1,4), 
-                 Density = c(tregion2A$d1_GATC_allInd_num, tregion2A$d2_CTAG_allInd_num, tregion2A$d3_TCGA_allInd_num, tregion2A$d4_AGCT_allInd_num),
-                 Seqeunce = c(rep('GATC', nrow(tregion2A)),rep('CTAG', nrow(tregion2A)), rep('TCGA', nrow(tregion2A)), rep('AGCT', nrow(tregion2A))),
-                 Direction = rep(tregion2A$strand,2),
-                 Which100 = 2)
-
-tregion3A$d1_GATC_allInd_num = getNum(tregion3A$d1_GATC_allInd)
-tregion3A$d2_CTAG_allInd_num = getNum(tregion3A$d2_CTAG_allInd)
-tregion3A$d3_TCGA_allInd_num = getNum(tregion3A$d3_TCGA_allInd)
-tregion3A$d4_AGCT_allInd_num = getNum(tregion3A$d4_AGCT_allInd)
-fu3A = data.frame(ID = rep(tregion3A$PAO1.ID.1,4), 
-                 Density = c(tregion3A$d1_GATC_allInd_num, tregion3A$d2_CTAG_allInd_num, tregion3A$d3_TCGA_allInd_num, tregion3A$d4_AGCT_allInd_num),
-                 Seqeunce = c(rep('GATC', nrow(tregion3A)),rep('CTAG', nrow(tregion3A)), rep('TCGA', nrow(tregion3A)), rep('AGCT', nrow(tregion3A))),
-                 Direction = rep(tregion3A$strand,2),
-                 Which100 = 4)
-
-tregion4A$d1_GATC_allInd_num = getNum(tregion4A$d1_GATC_allInd)
-tregion4A$d2_CTAG_allInd_num = getNum(tregion4A$d2_CTAG_allInd)
-tregion4A$d3_TCGA_allInd_num = getNum(tregion4A$d3_TCGA_allInd)
-tregion4A$d4_AGCT_allInd_num = getNum(tregion4A$d4_AGCT_allInd)
-fu4A = data.frame(ID = rep(tregion4A$PAO1.ID.1,4), 
-                  Density = c(tregion4A$d1_GATC_allInd_num, tregion4A$d2_CTAG_allInd_num, tregion4A$d3_TCGA_allInd_num, tregion4A$d4_AGCT_allInd_num),
-                  Seqeunce = c(rep('GATC', nrow(tregion4A)),rep('CTAG', nrow(tregion4A)), rep('TCGA', nrow(tregion4A)), rep('AGCT', nrow(tregion4A))),
-                  Direction = rep(tregion4A$strand,2),
-                  Which100 = 4)
-
-tregion5A$d1_GATC_allInd_num = getNum(tregion5A$d1_GATC_allInd)
-tregion5A$d2_CTAG_allInd_num = getNum(tregion5A$d2_CTAG_allInd)
-tregion5A$d3_TCGA_allInd_num = getNum(tregion5A$d3_TCGA_allInd)
-tregion5A$d4_AGCT_allInd_num = getNum(tregion5A$d4_AGCT_allInd)
-fu5A = data.frame(ID = rep(tregion4A$PAO1.ID.1,4), 
-                  Density = c(tregion5A$d1_GATC_allInd_num, tregion5A$d2_CTAG_allInd_num, tregion5A$d3_TCGA_allInd_num, tregion5A$d4_AGCT_allInd_num),
-                  Seqeunce = c(rep('GATC', nrow(tregion5A)),rep('CTAG', nrow(tregion5A)), rep('TCGA', nrow(tregion5A)), rep('AGCT', nrow(tregion5A))),
-                  Direction = rep(tregion5A$strand,2),
-                  Which100 = 5)
-
+fu = getFU(tregionALL, 1)
+fuC = getFUC(tregionC, 1)
+fuA = getFUA(tregionA, 1)
+fu2C = getFUC(tregion2C, 2)
+fu2A = getFUA(tregion2A, 2)
+fu3C = getFUC(tregion3C, 3)
+fu3A = getFUA(tregion3A, 3)
+fu4C = getFUC(tregion4C, 4)
+fu4A = getFUA(tregion4A, 4)
+fu5C = getFUC(tregion5C, 5)
+fu5A = getFUA(tregion5A, 5)
 
 
 ## ===================================
@@ -140,7 +87,7 @@ densityData <- fu_all
 densityData[densityData$Direction == '+', 'Direction'] = 'downstream'
 densityData[densityData$Direction == '-', 'Direction'] = 'upstream'
 
-densityData.lm = lm(Density ~ -1+ Seqeunce + Direction + Which100, densityData)
+densityData.lm = lm(Density ~ -1 + Seqeunce + Direction + Which100, densityData)
 summary(densityData.lm)
 
 
@@ -148,87 +95,34 @@ summary(densityData.lm)
 ## lm fu_allC: C methylated sequences
 ## ==================================
 fu_allC = rbind(fuC, fu2C, fu3C, fu4C, fu5C)
-fu_all = fu_all[order(fu_all$ID),]
-fu_all = fu_all[order(fu_all$Which100),]
+fu_allC = fu_allC[order(fu_allC$ID),]
+fu_allC = fu_allC[order(fu_allC$Which100),]
 
 densityDataC = read.csv('/Users/mazim/Desktop/fu_allC.csv')
 densityDataC[densityDataC$Direction == '+', 'Direction'] = 'downstream'
 densityDataC[densityDataC$Direction == '-', 'Direction'] = 'upstream'
 
-densityDataC.lm = lm(Density ~ Seqeunce + Direction + Which100, densityDataC)
+densityDataC.lm = lm(Density ~ -1 + Seqeunce + Direction + Which100, densityDataC)
 summary(densityDataC.lm)
 
 ## ==================================
 ## lm fu_allA: A methylated sequences
 ## ==================================
 fu_allA = rbind(fuA, fu2A, fu3A, fu4A, fu5A)
-fu_all = fu_all[order(fu_all$ID),]
-fu_all = fu_all[order(fu_all$Which100),]
+fu_allA = fu_allA[order(fu_allA$ID),]
+fu_allA = fu_allA[order(fu_allA$Which100),]
 
 densityDataA = read.csv('/Users/mazim/Desktop/fu_allA.csv')
 densityDataA[densityDataA$Direction == '+', 'Direction'] = 'downstream'
 densityDataA[densityDataA$Direction == '-', 'Direction'] = 'upstream'
 
-densityDataA.lm = lm(Density ~ Seqeunce + Direction + Which100, densityDataA)
+densityDataA.lm = lm(Density ~ -1 + Seqeunce + Direction + Which100, densityDataA)
 summary(densityDataA.lm)
-
 # summary(lm(Density ~ Seqeunce + Direction + Which100 + ID, densityData))
 
 
+fu[fu$Direction == '+', 'Direction'] = 'downstream'
+fu[fu$Direction == '-', 'Direction'] = 'upstream'
 
-
-
-
-getRegion <- function(df){
-  df_promoter = data.frame(Region = df$Gene,
-                          Start = df$searchStart,
-                          Stop = df$searchEnd)
-  return(df_promoter)
-}
-
-df_promoter = getRegion(tregionC_mod)
-methyl_CCGG = d1; methyl_CCGG$X = NULL
-methyl_GGCC = d2; methyl_CCGG$X = NULL
-methyl_GATC = d3; methyl_GATC$X = NULL
-methyl_CTAG = d4; methyl_CTAG$X = NULL
-methyl_TCGA = d5; methyl_TCGA$X = NULL
-methyl_AGCT = d6; methyl_AGCT$X = NULL
-
-
-getMethyl <- function(df, df_promoter){
-  df_methyl = data.frame(Start = df$start,
-                         End = df$end, 
-                         promoterRegion)
-  d_methyl$num = '' 
-}
-
-# df_methyl = methyl_CCGG
-
-getMythylSite <- function(df_methyl){
-  for(i in 1:nrow(df_methyl)){
-    
-    # inefficient
-    x = NULL; for(j in 1:nrow(df_promoter)){x = c(x, dplyr::between(df_methyl[i,1], df_promoter[j,1], df_promoter[j,2]))}
-    
-    indx = which(x == T)
-    if(length(indx) == 0){
-      # didnt find anything
-      df_methyl$promRegion[i] = F
-      df_methyl$numRegion[i] = sum(df_methyl[i,1] > df_promoter[,2])
-    }
-    if(length(indx) == 1){
-      # found promoter hit
-      df_methyl$promRegion[i] = T
-      df_methyl$numRegion[i] = indx
-    }
-  }
-}
-
-## methyl_CCGG = getMethylSite(d1)
-methyl_CCGG = getMythylSite(d1)
-methyl_GGCC = getMethylSite(d2, tregionC_mod)
-methyl_GATC = getMethylSite(d3, tregionA_mod)
-methyl_CTAG = getMethylSite(d4, tregionA_mod)
-methyl_TCGA = getMethylSite(d5, tregionA_mod)
-methyl_AGCT = getMethylSite(d6, tregionA_mod)
-
+fu.lm = lm(Density ~ -1 + Seqeunce + Direction + Which100, fu)
+summary(fu.lm)

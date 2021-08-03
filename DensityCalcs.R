@@ -3,6 +3,10 @@
 # MGA: July 21, 2021
 # +++++++++++++++++++++++++++++++++++++++++++++++++++++
 
+all = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/MethylPosition/ all_df.csv')
+methylALL = data.frame(start = all$start, 
+                       end = all$end)
+
 d1 = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/MethylPosition/CCGG_position.csv')
 d2 = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/MethylPosition/GGCC_position.csv')
 methylC = data.frame(start = c(d1$start, d2$start), 
@@ -51,10 +55,10 @@ getDensity <- function(whichDF, methylDF){
   x <- x[-Nps]
   xdens <- x / nx
   
-  xdens
-  vdens
+  return(list(xdens, vdens))
 }
 
+all_mod <- getDensity('tregion_mod.csv', methylALL)
 A_mod <- getDensity('tregionA_mod.csv', methylA)
 C_mod <- getDensity('tregionC_mod.csv', methylC)
 
@@ -97,39 +101,61 @@ getCodingDen <- function(whichDF, methyl){
   vdens <- v / 100
   cdens <- c / nx
   
-  cdens
-  vdens
+  return(list(cdens,vdens))
 }
 
+CodingRegionALL <- getCodingDen('tregion_mod.csv', methylALL)
 CodingRegionA <- getCodingDen('tregionA_mod.csv', methylA)
+CodingRegionC <- getCodingDen('tregionC_mod.csv', methylC)
+
+
+getBoxPlot <- function(xdens, vdens, varia){
+  library(ggplot2)
+  
+  gg_dens = data.frame(key = c(rep(varia, length(xdens)),rep('Promoter Region', length(vdens))),
+                        value = c(xdens, vdens))
+  ggplot(data = gg_dens, aes(x = key, y = value, fill = key))+
+    geom_boxplot(alpha = 0.7, outlier.shape = NA)+
+    #geom_violin(alpha = 0.7)+
+    geom_jitter(position=position_jitter(width = 0.2, height = 0.001), alpha = 0.5)+
+    ylab('Density (with jitter)')+
+    xlab('')+
+    theme(legend.position = 'none', axis.text = element_text(size = 13), 
+          axis.title = element_text(size = 15))+
+    ggsignif::geom_signif(comparisons = list(c(varia, "Promoter Region")),
+                          map_signif_level=TRUE)
+}
+
+getBoxPlot(all_xdens, all_vdens, 'Non-promoter Region')
+getBoxPlot(A_xdens, A_vdens, 'Non-promoter Region')
+getBoxPlot(C_xdens, C_vdens, 'Non-promoter Region')
+getBoxPlot(cr_cdens, cr_vdens, 'Coding Region')
+getBoxPlot(crC_cdens, crC_vdens, 'Coding Region')
+getBoxPlot(crA_cdens, crA_vdens, 'Coding Region')
 
 
 
-library(ggplot2)
-gg_densA = data.frame(key = c(rep('Non-promoter Region', length(xdens)),rep('Promoter Region', length(vdens))),
-                      value = c(xdens, vdens))
-ggplot(data = gg_densA, aes(x = key, y = value, fill = key))+
-  geom_boxplot(alpha = 0.7, outlier.shape = NA)+
-  #geom_violin(alpha = 0.7)+
-  geom_jitter(position=position_jitter(width = 0.2, height = 0.001), alpha = 0.5)+
-  ylab('Density (with jitter)')+
-  xlab('')+
-  theme(legend.position = 'none', axis.text = element_text(size = 13), 
-        axis.title = element_text(size = 15))+
-  ggsignif::geom_signif(comparisons = list(c("Non-promoter Region", "Promoter Region")),
-                        map_signif_level=TRUE)
+getViolinPlot <- function(xdens, vdens, varia){
+  library(ggplot2)
+  gg_dens = data.frame(key = c(rep(varia, length(xdens)),rep('Promoter Region', length(vdens))),
+                        value = c(xdens, vdens))
+  ggplot(data = gg_dens, aes(x = key, y = value, fill = key))+
+    #geom_boxplot(alpha = 0.7, outlier.shape = NA)+
+    geom_violin(alpha = 0.7)+
+    geom_jitter(position=position_jitter(width = 0.2, height = 0.001), alpha = 0.5)+
+    ylab('Density (with jitter)')+
+    xlab('')+
+    # ylim(0,10)+
+    theme(legend.position = 'none', axis.text = element_text(size = 13), 
+          axis.title = element_text(size = 15))+
+    ggsignif::geom_signif(comparisons = list(c(varia, "Promoter Region")),
+                          map_signif_level=TRUE)
+}
 
-library(ggplot2)
-gg_densA = data.frame(key = c(rep('Coding Region', length(xdensA)),rep('Promoter Region', length(vdens))),
-                      value = c(xdens, vdens))
-ggplot(data = gg_dens, aes(x = key, y = value, fill = key))+
-  #geom_boxplot(alpha = 0.7, outlier.shape = NA)+
-  geom_violin(alpha = 0.7)+
-  geom_jitter(position=position_jitter(width = 0.2, height = 0.001), alpha = 0.5)+
-  ylab('Density (with jitter)')+
-  xlab('')+
-  # ylim(0,10)+
-  theme(legend.position = 'none', axis.text = element_text(size = 13), 
-        axis.title = element_text(size = 15))+
-  ggsignif::geom_signif(comparisons = list(c("Coding Region", "Promoter Region")),
-                        map_signif_level=TRUE)
+getViolinPlot(all_xdens, all_vdens, 'Non-promoter Region')
+getViolinPlot(A_xdens, A_vdens, 'Non-promoter Region')
+getViolinPlot(C_xdens, C_vdens, 'Non-promoter Region')
+getViolinPlot(cr_cdens, cr_vdens, 'Coding Region')
+getViolinPlot(crC_cdens, crC_vdens, 'Coding Region')
+getViolinPlot(crA_cdens, crA_vdens, 'Coding Region')
+

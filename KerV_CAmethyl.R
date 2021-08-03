@@ -1,5 +1,5 @@
 d = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/KerV start_stop.csv')
-tregionC <- tregionA <- d[1:470,4:11] 
+tregion <- tregionC <- tregionA <- d[1:470,4:11] 
 
 # read all files with the methyl site positions and compile a data frame with all of the psoitions of each site combined
 # ======================================================================================================================
@@ -10,6 +10,67 @@ d4 = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/MethylPo
 d5 = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/MethylPosition/TCGA_position.csv')[,2:3]
 d6 = read.csv('/Users/mazim/Documents/RahmeLab/Analysis/KerV/DataFrames/MethylPosition/AGCT_position.csv')[,2:3]
 
+
+## =======================================
+## Make dataframe for ALL methylated sites
+## =======================================
+
+getPosition <- function(sRegion, ms1, ms2, ms3, ms4, ms5, ms6, n) {
+  
+  df = sRegion
+  df$Start.site <- df$Start.site - n
+  df$Promoter.region <- as.numeric(df$Promoter.region)
+  df$Promoter.region <- df$Promoter.region - n
+  df$Stop.site <- df$Stop.site + n
+  df$Next.promoter.region <- df$Next.promoter.region + n
+  all_df = data.frame(start = c(ms1$start, ms2$start, ms3$start, ms4$start, ms5$start, ms6$start), 
+                        end = c(ms1$end, ms2$end, ms3$end, ms4$end, ms5$end, ms6$end),
+                        mthyl = c(rep('CCGG', nrow(ms1)),
+                                  rep('GGCC', nrow(ms2)),
+                                  rep('GATC', nrow(ms3)),
+                                  rep('CTAG', nrow(ms4)),
+                                  rep('TCGA', nrow(ms5)),
+                                  rep('AGCT', nrow(ms6))))
+  
+  df$searchStart = ifelse(df$strand == '+', yes = df$Promoter.region, no = df$Stop.site)
+  df$searchEnd = ifelse(df$strand == '+', yes = df$Start.site, no = df$Next.promoter.region)
+  
+  dfA$num = ''  #number of methylation sites in that promoter region
+  for(i in 1:nrow(df)){
+    z = which(dplyr::between(all_df$start, df$searchStart[i], df$searchEnd[i]))
+    if(length(y) > 0){
+      df$num[i] = stringr::str_flatten(z, collapse = ', ')
+    }
+  }
+  
+  df$d1_CCGG_allInd = ''
+  df$d2_GGCC_allInd = ''
+  df$d3_GATC_allInd = ''
+  df$d4_CTAG_allInd = ''
+  df$d5_TCGA_allInd = ''
+  df$d6_AGCT_allInd = ''
+  
+  for(i in 1:nrow(df)){
+    z1 = which(dplyr::between(ms1$start, df$searchStart[i], df$searchEnd[i]))
+    z2 = which(dplyr::between(ms2$start, df$searchStart[i], df$searchEnd[i])) + nrow(ms1)
+    z3 = which(dplyr::between(ms3$start, df$searchStart[i], df$searchEnd[i])) + nrow(ms1) + nrow(ms2)
+    z4 = which(dplyr::between(ms4$start, df$searchStart[i], df$searchEnd[i])) + nrow(ms1) + nrow(ms2) + nrow(ms3)
+    z5 = which(dplyr::between(ms5$start, df$searchStart[i], df$searchEnd[i])) + nrow(ms1) + nrow(ms2) + nrow(ms3) + nrow(ms4)
+    z6 = which(dplyr::between(ms6$start, df$searchStart[i], df$searchEnd[i])) + nrow(ms1) + nrow(ms2) + nrow(ms3) + nrow(ms4) + nrow(ms5)
+    
+    if(length(z1) > 0){df$d1_CCGG_allInd[i] = stringr::str_flatten(z1, collapse = ', ')}
+    if(length(z2) > 0){df$d2_GGCC_allInd[i] = stringr::str_flatten(z2, collapse = ', ')}
+    if(length(z3) > 0){df$d3_GATC_allInd[i] = stringr::str_flatten(z3, collapse = ', ')}
+    if(length(z4) > 0){df$d4_CTAG_allInd[i] = stringr::str_flatten(z4, collapse = ', ')}
+    if(length(z5) > 0){df$d5_TCGA_allInd[i] = stringr::str_flatten(z5, collapse = ', ')}
+    if(length(z6) > 0){df$d6_AGCT_allInd[i] = stringr::str_flatten(z6, collapse = ', ')}
+  }
+  
+  
+  df$num_sum = unlist(purrr::map(stringr::str_split(df$num, ', '), function(y) length(y[y != ''])))
+  df = df[order(-df$num_sum),]
+  df
+}
 
 
 ## =======================================
@@ -55,7 +116,6 @@ getPositionC <- function(sRegion, ms1, ms2, n) {
   dfC = dfC[order(-dfC$num_sum),]
   dfC
 }
-
 
 
 ## =======================================
@@ -113,6 +173,7 @@ getPositionA <- function(sRegion, ms1, ms2, ms3, ms4, n) {
 
 ## First +/- 100 run: C/A 
 ## ----------------------------
+tregion_mod <- getPosition(tregion, d1, d2, d3, d4, d5, d6, 0)
 tregionC_mod <- getPositionC(tregionC, d1, d2, 0)
 tregionA_mod <- getPositionA(tregionA, d3, d4, d5, d6, 0)
 
